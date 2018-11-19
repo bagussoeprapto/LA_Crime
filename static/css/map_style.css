@@ -1,0 +1,68 @@
+#map {
+    height: 80%;
+    width: 80%;
+    margin-top: 30px;
+    margin-bottom: 0px;
+    padding: 0;
+    align-self: stretch;
+    position: fixed;
+}
+
+html, body, #sitemap {
+    height: 100%;
+    width: 100%;
+    margin: auto;
+    padding: auto;
+}
+
+.mapcontainer {
+    height: 500px;
+}
+
+#maptwo {
+    height: 100%;
+    width: 100%;
+    margin-top: 0px;
+    margin-bottom: 10px;
+    padding: 0;
+/*    align-self: stretch; */
+    position: absolute;
+/*    position: fixed; */
+}
+
+/* #maptwo {
+    height: 100%;
+    width: 100%;
+    margin-top: 0px;
+    margin-bottom: 10px;
+    padding: 0;
+    align-self: stretch;
+    position: fixed;
+} */
+
+.legend {
+    line-height: 18px;
+    color: #555;
+    background-color: aliceblue;
+    padding: 5px;
+    border-radius: 5px;
+
+}
+.legend i {
+    width: 18px;
+    height: 18px;
+    color: #555;
+    background-color: aliceblue;
+    float: left;
+    margin-right: 8px;
+    opacity: 0.7;
+
+}
+
+.info.legend.leaflet-control {
+    margin-bottom: 100px;
+}
+
+.leaflet-bottom.leaflet-left{
+    width: 100%;
+  }

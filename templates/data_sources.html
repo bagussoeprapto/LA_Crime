@@ -1,0 +1,72 @@
+{% extends "index_core.html" %}
+{% block content %}
+
+
+<link href="https://unpkg.com/tabulator-tables@4.0.5/dist/css/tabulator.min.css" rel="stylesheet">
+<script type="text/javascript" src="https://unpkg.com/tabulator-tables@4.0.5/dist/js/tabulator.min.js"></script>
+<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+
+
+<div class="container-fluid mt-5">
+        <div class="animated fadeIn">
+            <div class="row mb-2">
+                <div class="col-md-12 text-center">       
+                    <h2>Data Sources</h2>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <ul>
+                    <li>Superfund Site Information: 
+                        <ul>
+                            <li>National Institute of Health: 
+                                <a href="https://toxmap.nlm.nih.gov/toxmap/download/superfund_npl.csv">https://toxmap.nlm.nih.gov/toxmap/download/superfund_npl.csv</a>
+                            </li>
+                            <li>Environmental Protection Agency: <a href="https://www.epa.gov/superfund/superfund-national-priorities-list-npl">https://www.epa.gov/superfund/superfund-national-priorities-list-npl</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>State Stats: </li>
+                        <ul>
+                            <li>US Census Bureau Population Housing and Density State Comparison:
+                                <a href="https://factfinder.census.gov/bkmk/table/1.0/en/DEC/10_SF1/GCTPH1.US01PR/0100000US">https://factfinder.census.gov/bkmk/table/1.0/en/DEC/10_SF1/GCTPH1.US01PR/0100000US</a>
+                            </li>
+                            <li>US Census Bureau Poverty State Comparison:
+                                <a href="https://factfinder.census.gov/bkmk/table/1.0/en/ACS/16_5YR/GCT1701.US01PR/0100000US">https://factfinder.census.gov/bkmk/table/1.0/en/ACS/16_5YR/GCT1701.US01PR/0100000US</a>
+                            </li>
+                            <li>US Census Bureau Median Household Income State Comparison:
+                                <a href="https://factfinder.census.gov/bkmk/table/1.0/en/ACS/16_5YR/GCT1901.US01PR/0100000US">https://factfinder.census.gov/bkmk/table/1.0/en/ACS/16_5YR/GCT1901.US01PR/0100000US</a>
+                            </li>
+                            <li>US Census Bureau Veterans State Comparison:
+                                <a href="https://factfinder.census.gov/bkmk/table/1.0/en/ACS/16_5YR/GCT2101.US01PR/0100000US">https://factfinder.census.gov/bkmk/table/1.0/en/ACS/16_5YR/GCT2101.US01PR/0100000US</a>
+                            </li>
+                            <li>CDC and NIH State Cancer Profiles:
+                                <a href="https://www.statecancerprofiles.cancer.gov/">https://www.statecancerprofiles.cancer.gov/</a>
+                            </li>
+                        </ul>
+                    </ul>
+                </div>
+            </div>
+            <div class="row mt-4">
+                <div class="col-md-12 text-center">       
+                    <h2>Technology</h2>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                  <ul>
+                    <li>Backend and API: Python/Flask
+                    </li>
+                    <li>Database: SQLite3</li>
+                    <li>HTML/Styles: Bootstrap 4.1</li>
+                    <li>Maps: Leaflet.js</li>
+                    <li>Tables: <a href="http://tabulator.info/"><b>Tabulator</b></a>, D3.js</li>
+                    <li>Scatter plot: D3.js, <a href="https://simplestatistics.org/">Simple Statistics</a></li>
+                    <li>Misc: jQuery</li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+</div>
+{% endblock %}
