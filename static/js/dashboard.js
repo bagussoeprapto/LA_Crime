@@ -65,101 +65,6 @@ function buildMap() {
   });
 }
 
-// Build the Gauge Chart
-function buildGauge() {
-  idname = d3.select("#selDataset").property("value");
-  d3.json("/crime_sites/"+dr_no).then(function(metaData) {
-
-  gaugeTitle = (`Crime Ranking <br>${metaData.crm_cd_desc}`);
-  d3.select("#gaugeTitle").html(gaugeTitle);
-    
-  var hazardScore = metaData.crm_cd;
-  console.log(hazardScore);
-  
-  var level = hazardScore * 2
-
-  var degrees = 180 - level,
-    radius = .5;
-  var radians = degrees * Math.PI / 180;
-  var x = radius * Math.cos(radians);
-  var y = radius * Math.sin(radians);
-
-  // Path: may have to change to create a better triangle
-  var mainPath = 'M -.0 -0.01 L .0 0.01 L ',
-    pathX = String(x),
-    space = ' ',
-    pathY = String(y),
-    pathEnd = ' Z';
-  var path = mainPath.concat(pathX, space, pathY, pathEnd);
-
-  var data = [{
-    type: 'scatter',
-    x: [0], y: [0],
-    marker: { size: 15, color: '000000' },
-    showlegend: false,
-    id: 'scrubs/week',
-    text: hazardScore,
-    hoverinfo: 'text+name'
-  },
-  {
-    values: [50 / 9, 50 / 9, 50 / 9, 50 / 9, 50 / 9, 50 / 9, 50 / 9, 50 / 9, 50 / 9, 50],
-    rotation: 90,
-    text: ["80-90", "70-80", "60-70", "50-60", "40-50", "30-40", "20-30", "10-20", "0-10", ""],
-    textinfo: 'text',
-    textposition: 'inside',
-    marker: {
-      colors: ['rgba(255,0,0,0.6)',
-               'rgba(255,28,28,0.6)',
-               'rgba(255,56,56,0.6)',
-               'rgba(255,84,84,0.6)',
-               'rgba(255,112,112,0.6)',
-               'rgba(255,140,140,0.6)',
-               'rgba(255,168,168,0.6)',
-               'rgba(255,197,197,0.6)',
-               'rgba(255,225,225,0.6)',
-               '#FFFFFF',
-              ]
-    },
-    labels: ['9', '8', '7', '6', '5', '4', '3', '2', '1', '0'],
-    hoverinfo: 'label',
-    hole: .5,
-    type: 'pie',
-    showlegend: false
-  }];
-
-  var layout = {
-    shapes: [{
-      type: 'path',
-      path: path,
-      fillcolor: '000000',
-      line: {
-        color: '000000'
-      }
-    }],
-    title: `<b>Crime Ranking</b>`,
-    height: 350,
-    width: 450,
-    margin: {
-      l: 0,
-      r: 0,
-      b: 0,
-      t: 60,
-      pad: 5
-    },
-    xaxis: {
-      zeroline: false, showticklabels: false,
-      showgrid: false, range: [-1, 1]
-    },
-    yaxis: {
-      zeroline: false, showticklabels: false,
-      showgrid: false, range: [-1, 1]
-    }
-  };
-
-  Plotly.newPlot('gauge', data, layout, {displayModeBar: false});
-
-});
-}
 
 function init() {
 
@@ -195,7 +100,6 @@ function init() {
     const firstSample = sampleIdName[0];
     // buildCharts(firstSample);
     buildMetadata(firstSample);
-    buildGauge(firstSample);
     buildMap(firstSample);
     console.log(firstSample);
   });  
@@ -205,7 +109,6 @@ function optionChanged(newSample) {
   // Fetch new data each time a new sample is selected
   // buildCharts(newSample);
   buildMetadata(newSample);
-  buildGauge(newSample);
   buildMap(newSample);
   console.log(newSample);
 }

@@ -6,6 +6,7 @@ html {
   min-width: 100%;
   margin: auto;
   padding: auto;
+  font-family: 'Roboto Mono', monospace;
 }
 
 body {
@@ -15,7 +16,8 @@ body {
   min-width: 100%;
   margin: auto;
   padding: auto;
- }
+  font-family: 'Roboto Mono', monospace;
+}
 
 main {
   min-height: 100%;
