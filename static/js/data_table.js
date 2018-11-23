@@ -11,10 +11,10 @@
 		{title:"Area", field:"area_name", width:80, align:"left", headerFilter: true},
 		{title:"Location", field:"location", align:"left", headerFilter: true, width:120},
 	 	{title:"Cross Steet", field:"cross_street", align:"left", width:150},
-	 	{title:"Cd", field:"crm_cd", align:"left", sorter:"number", width:70},
+	 	{title:"Code", field:"crm_cd", align:"left", sorter:"number", width:70},
 	 	{title:"Crime Description", field:"crm_cd_desc", align:"left", headerFilter:true},
-	 	{title:"Date Occurred", field:"date_occ", align:"left", headerFilter:true},
-		{title:"Hr", field:"hour_occ", align:"leftr", sorter:"number", width:70},
+	 	{title:"Date Occurred", field:"date_occ", align:"left", headerFilter:true, width:130},
+		{title:"Hour", field:"hour_occ", align:"leftr", sorter:"number", width:70},
 		{title:"Premises", field:"premis_desc", align:"left"},
 		{title:"Status", field:"status_desc", align:"left", width:100},
 		{title:"Weapon", field:"weapon_desc", align:"left", headerFilter:true}

@@ -27,7 +27,7 @@ function buildMetadata() {
                <h5>Area: ${metaData.area_name}<br>
                Location: ${metaData.location}<br>
                Cross Street: ${metaData.cross_street}<br>
-               Date: ${metaData.date_occ}<br>
+               Date: ${metaData.date_occ.slice(0,16)}<br>
                Hour: ${metaData.hour_occ}<br>
                Weapon Used: ${metaData.weapon_desc}<br>
                `);

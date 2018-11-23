@@ -33,16 +33,18 @@ def index():
 @app.route("/new_la_crime_data")
 def refresh_data():
     # Collect refreshed data from LA crime API (https://data.lacity.org/resource/7fvc-faax.json?)
-    incidents = requests.get("https://data.lacity.org/resource/7fvc-faax.json?").json()
+    incidents = requests.get("https://data.lacity.org/resource/7fvc-faax.json?$order=date_occ%20DESC").json()
     
     # Store new crime_data in dataframe and convert datatypes
     crime_data = pd.DataFrame(incidents).set_index(["dr_no"])
+    crime_data = crime_data.sort_values(by='date_occ', ascending=False)
 
     crime_data['area_id'] = crime_data['area_id'].apply(pd.to_numeric)
     crime_data['crm_cd'] = crime_data['crm_cd'].apply(pd.to_numeric)
     crime_data['crm_cd_1'] = crime_data['crm_cd_1'].apply(pd.to_numeric)
     crime_data['crm_cd_2'] = crime_data['crm_cd_2'].apply(pd.to_numeric)
     crime_data['crm_cd_3'] = crime_data['crm_cd_3'].apply(pd.to_numeric)
+    #crime_data = crime_data.drop(columns=['crm_cd_4'])
     crime_data['date_occ'] = pd.to_datetime(crime_data['date_occ'], infer_datetime_format=True)
     crime_data['date_rptd'] = pd.to_datetime(crime_data['date_rptd'], infer_datetime_format=True)
     crime_data[['loc_type','coordinates']] = crime_data['location_1'].apply(pd.Series)
@@ -56,8 +58,7 @@ def refresh_data():
     crime_data = crime_data.drop(columns=['time_occ'])
     crime_data['vict_age'] = crime_data['vict_age'].apply(pd.to_numeric)
     crime_data['weapon_used_cd'] = crime_data['weapon_used_cd'].apply(pd.to_numeric)
-    drop_cols = [0,1,2,3,4,5]
-    crime_data.drop(crime_data.columns[drop_cols], axis=1, inplace=True)
+    
 
     # Drop and create new_la_crime table in sqlite db form crime_data dataframe
     # Create sqlalchemy engine
@@ -66,7 +67,7 @@ def refresh_data():
     c = conn.cursor()
     c.execute('''DROP TABLE IF EXISTS new_la_crime;''')
     c.execute('''CREATE TABLE new_la_crime
-                (dr_no INTEGER PRIMARY KEY ASC,
+                (dr_no INTEGER PRIMARY KEY,
                 area_id INTEGER,
                 area_name VARCHAR(64),
                 crm_cd INTEGER,
@@ -171,8 +172,8 @@ def state_stats_get_data():
 def crime_sites():
     r""" This function returns the list of crime incidents
     with coordinates """
-    
-    res = db.session.query(LACrime).all()
+      
+    res = db.session.query(LACrime).order_by('new_la_crime.date_occ desc')
 
     dlist = []
     for dset in res:
