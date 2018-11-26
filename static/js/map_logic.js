@@ -1,80 +1,92 @@
-// Grabbing superfund site data.
-var superfundSites = [];
-var stateStats = [];
+// Grabbing LA crime site data.
+var crimeSites = [];
+var zipStats = [];
 
-d3.json("/superfund_sites", function (data) {
+d3.json("/crime_sites", function (data) {
 
   data.forEach(function (sqlitedata) {
-    data.name = sqlitedata.name;
-    data.address = sqlitedata.address;
-    data.city = sqlitedata.city;
-    data.state = sqlitedata.state;
-    data.hrs_score = +sqlitedata.hrs_score;
+    data.crm_cd = + sqlitedata.crm_cd;
+    data.crm_cd_desc = sqlitedata.crm_cd_desc;
+    data.area_name = sqlitedata.area_name;
+    data.location = sqlitedata.location;
+    data.cross_street = sqlitedata.cross_street;
+    data.date_occ = sqlitedata.date_occ;
+    data.hour_occ = +sqlitedata.hour_occ;
     data.latitude = +sqlitedata.latitude;
     data.longitude = +sqlitedata.longitude;
-    data.id = +sqlitedata.id;
-    superfundSites.push(
+    data.dr_no = +sqlitedata.dr_no;
+    crimeSites.push(
       L.circleMarker([data.latitude, data.longitude],
         {
-          radius: 10,
-          fillColor: getColorSFSites(data.hrs_score),
+          radius: 5,
+          fillColor: getColorCrimeSites(data.crm_cd),
           fillOpacity: .7,
           stroke: true,
           color: "black",
           weight: .5
         }
         //,{ icon: L.BeautifyIcon.icon(options) }
-      ).bindPopup(data.name.bold() + "<br>" + data.address + "<br>" + data.city + ", " + data.state + "<br>HRS Score: " + data.hrs_score + "<br>Site ID: " + data.id.toString().bold()));
+      ).bindPopup(data.crm_cd_desc.bold() + "<br>" + data.location + "<br>" + data.area_name + " Area" + "<br>" + data.date_occ.slice(0,16) + " @ " + data.hour_occ + ":00" + "<br>DivRec#: " + data.dr_no.toString().bold()));
   });
 
-  var statePopDensChloro;
-  var stateCancerChloro;
-  var stateHRSChloro;
-  var stateIncomeChloro;
-  var PopLegend;
-  var CanLegend;
-  var HRSLegend;
+  var zipEmploymentRateChloro;
+  var zipIncomeChloro;
+  var zipADIChloro;
+  var zipDeathsChloro;
+  var zipOpioidRxChloro;
+  var EmpRateLegend;
   var InLegend;
+  var ADILegend;
+  var DeathsLegend;
+  var OpioidRxLegend;
 
-  d3.json("/state_stats/get_data", function (data) {
+  d3.json("/crime_stats/get_data", function (data) {
     data.forEach(function (xdata) {
-      var xstate = xdata.state;
-      objIndex = statesData.features.findIndex((obj => obj.properties.name == xstate));
-      statesData.features[objIndex].properties.state_stats = xdata;
+      var xzip = xdata.zip;
+      objIndex = zip_boundaries.features.findIndex((obj => obj.properties.name == xzip));
+      zip_boundaries.features[objIndex].properties.la_zip_stats = xdata;
     });
-    // remove Puerto Rico
-    statesData.features = statesData.features.filter(function (item) {
-           return item.properties.name !== "Puerto Rico"
+
+    zip_boundaries.features = zip_boundaries.features.filter(function (item) {
+      return la_zips.indexOf(item.properties.name) > -1;  // la_zips is from la_zips.js, which contains a list of zips for LA that match to the geojson file for zipcode boundaries
     });
+
+    console.log(la_zips);
 
     // extract min-max data needed for legends
-    var res = createStateChloro("population_density", statesData, "Population Density");
-    statePopDensChloro = res[0];
-    PopLegend = res[1];
+    var res = createZipChloro("pct_full_time_employed_pop", zip_boundaries, "Percent Employed");
+    zipEmploymentRateChloro = res[0];
+    EmpRateLegend = res[1];
 
-    res = createStateChloro("cancer_death_rate", statesData, "Cancer Death Rate");
-    stateCancerChloro = res[0];
-    CanLegend = res[1];
-
-    res = createStateChloro("avg_hrsscore", statesData, "Avg. Hazard Ranking");
-    stateHRSChloro = res[0];
-    HRSLegend = res[1];
-
-    res = createStateChloro("median_household_income", statesData, "Avg. Income");    
-    stateIncomeChloro = res[0];
+    res = createZipChloro("household_median_income", zip_boundaries, "Median Income");    
+    zipIncomeChloro = res[0];
     InLegend = res[1];
 
-    createMap(superfundSites,
-      statePopDensChloro,PopLegend,
-      stateCancerChloro,CanLegend,
-      stateHRSChloro,HRSLegend,
-      stateIncomeChloro,InLegend);
+    res = createZipChloro("adi_state_rank", zip_boundaries, "Neighborhood Deprivation");    
+    zipADIChloro = res[0];
+    ADILegend = res[1];
+
+    res = createZipChloro("total_deaths_per_1000", zip_boundaries, "Deaths per 1,000 Pop");    
+    zipDeathsChloro = res[0];
+    DeathsLegend = res[1];
+
+    res = createZipChloro("opioid_rx_per_1000", zip_boundaries, "Opioid Rx per 1,000 Pop");    
+    zipOpioidRxChloro = res[0];
+    OpioidRxLegend = res[1];
+
+
+    createMap(crimeSites,
+      zipEmploymentRateChloro,EmpRateLegend,
+      zipIncomeChloro,InLegend,
+      zipADIChloro,ADILegend,
+      zipDeathsChloro,DeathsLegend,
+      zipOpioidRxChloro,OpioidRxLegend);
 
   });
 
 });
 
-function createStateChloro(prop,sdata,name) {
+function createZipChloro(prop,sdata,name) {
 
   var chloro = new L.LayerGroup();
 
@@ -87,24 +99,25 @@ function createStateChloro(prop,sdata,name) {
     });
   }
 
-  // Add style to assign state color based on population density
+  // Add style to assign zip color based on employment rate
   function Xstyle(feature) {
     var prop_max = prop+"_max";
     var prop_min = prop+"_min";
 
     return {
-      fillColor: colorScale(feature.properties.state_stats[prop],
-        feature.properties.state_stats[prop_min],
-        feature.properties.state_stats[prop_max]),
+      fillColor: colorScale(feature.properties.la_zip_stats[prop],
+        feature.properties.la_zip_stats[prop_min],
+        feature.properties.la_zip_stats[prop_max]),
       weight: 2,
-      opacity: 1,
+      opacity: 0.3,
       color: 'white',
       dashArray: '3',
-      fillOpacity: 0.7
+      //fillOpacity: 0.5,
+      zindex: -0.25
     };
   }
 
-  geojson = L.geoJson(statesData, {
+  geojson = L.geoJson(zip_boundaries, {
       style: Xstyle,
       onEachFeature: XonEachFeature
    }).addTo(chloro);
@@ -117,8 +130,8 @@ function createStateChloro(prop,sdata,name) {
     var prop_min = prop + "_min";
 
     // compute grades
-    var min = sdata.features[0].properties.state_stats[prop_min];
-    var max = sdata.features[0].properties.state_stats[prop_max];
+    var min = sdata.features[0].properties.la_zip_stats[prop_min];
+    var max = sdata.features[0].properties.la_zip_stats[prop_max];
 
     var bgrades = [0,1,2,3,4,5,6]
     for(i=0;i<bgrades.length;i++) {
@@ -130,7 +143,7 @@ function createStateChloro(prop,sdata,name) {
       labels = [];
 
     div.innerHTML += '<b>'+name+'</b><br>'
-    // Loop through intervals to generate labels and colored squares for superfund hazard rank legend
+    // Loop through intervals to generate labels and colored squares for crime site legend
     for (var i = 0; i < grades.length; i++) {
       div.innerHTML +=
         '<i style="background:' + colorScale(grades[i] + 1,min,max) + '"></i> ' +
@@ -143,17 +156,18 @@ function createStateChloro(prop,sdata,name) {
 }
 
 
-function createMap(superfundSites,
-  statePopDensChloro,PopLegend,
-  stateCancerChloro,CanLegend,
-  stateHRSChloro,HRSLegend,
-  stateIncomeChloro,InLegend) {
+function createMap(crimeSites,
+  zipEmploymentRateChloro,EmpRateLegend,
+  zipIncomeChloro,InLegend,
+  zipADIChloro,ADILegend,
+  zipDeathsChloro,DeathsLegend,
+  zipOpioidRxChloro,OpioidRxLegend) {
 
   // Define tile layers
-  var satelliteMap = L.tileLayer("https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}", {
+  var darkMap = L.tileLayer("https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}", {
     attribution: "Map data &copy; <a href='https://www.openstreetmap.org/'>OpenStreetMap</a> contributors, <a href='https://creativecommons.org/licenses/by-sa/2.0/'>CC-BY-SA</a>, Imagery © <a href='https://www.mapbox.com/'>Mapbox</a>",
     maxZoom: 18,
-    id: "mapbox.satellite",
+    id: "mapbox.dark",
     accessToken: API_KEY
   });
   var streetMap = L.tileLayer("https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}", {
@@ -171,33 +185,34 @@ function createMap(superfundSites,
 
   // Define a baseMaps object to hold our base layers
   var baseMaps = {
-    "Satellite Map": satelliteMap,
+    "Dark Map": darkMap,
     "Street Map": streetMap,
     "Light Map": lightMap
   };
 
-  // Add superfund and stateBoundary layers
-  var superfundLayer = L.layerGroup(superfundSites);
+  // Add crime sites and zip code boundary layers
+  var crimeLayer = L.layerGroup(crimeSites);
   var emptyLayer = new L.LayerGroup()
 
   // Overlays that may be toggled on or off
   var overlayMaps = {
-    "Superfund Sites": superfundLayer,
+    "LA Crime Sites": crimeLayer,
   };
 
   var overlayMapsAsBase = {
     "Nothing": emptyLayer,
-    "Cancer Death Rate": stateCancerChloro,
-    "Population Density": statePopDensChloro,
-    "Avg. HRS Score": stateHRSChloro,
-    "Avg. Income": stateIncomeChloro
+    "Employment Rate": zipEmploymentRateChloro,
+    "Median Income": zipIncomeChloro,
+    "Neighborhood Deprivation": zipADIChloro,
+    "Deaths per 1,000 Pop": zipDeathsChloro,
+    "Opioid Rx per 1,000 Pop": zipOpioidRxChloro
   };
 
   // Creating map object and set default layers
   var myMap = L.map("map", {
-    center: [37.8283, -98.5795],
-    zoom: 5,
-    layers: [streetMap, superfundLayer, emptyLayer]
+    center: [34.02, -118.3],
+    zoom: 10.4,
+    layers: [streetMap, crimeLayer, emptyLayer]
   });
 
 
@@ -213,68 +228,79 @@ function createMap(superfundSites,
   myMap.addControl(xcontrol);
 
 
-  // Create legend, this one is for the superfund stuff
-  var legendSF = L.control({ position: 'bottomright' });
-  legendSF.onAdd = function (myMap) {
+  // Create legend, this one is for the crime site stuff
+  var legendCS = L.control({ position: 'bottomright' });
+  legendCS.onAdd = function (myMap) {
     var div = L.DomUtil.create('div', 'info legend'),
-      grades = [0, 10, 20, 30, 40, 50, 60, 70],
+      grades = [100, 200, 300, 400, 500, 600, 700],
       labels = ['<strong>Text</strong>'];
 
-    div.innerHTML += '<b>Hazard Ranking</b><br>' 
-    // Loop through intervals to generate labels and colored squares for superfund hazard rank legend
+    div.innerHTML += '<b>Crime Code</b><br>' 
+    // Loop through intervals to generate labels and colored squares for crime site legend
     for (var i = 0; i < grades.length; i++) {
       div.innerHTML +=
-        '<i style="background:' + getColorSFSites(grades[i] + 1) + '"></i> ' +
+        '<i style="background:' + getColorCrimeSites(grades[i] + 1) + '"></i>' +
         grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
     }
     return div;
   };
-  legendSF.addTo(myMap);
+  legendCS.addTo(myMap);
 
 
   myMap.on('overlayadd', function (eventLayer) {
-    if (eventLayer.name === "Superfund Sites") {
-      legendSF.addTo(this);
+    if (eventLayer.name === "LA Crime Sites") {
+      legendCS.addTo(this);
     }
     else {
-      CanLegend.addTo(this);
-      this.removeControl(legendSF);
+      EmpRateLegend.addTo(this);
+      this.removeControl(legendCS);
     }
   });
 
   myMap.on('overlayremove', function (eventLayer) {
-    if (eventLayer.name === "Superfund Sites") {
-      this.removeControl(legendSF);
+    if (eventLayer.name === "LA Crime Sites") {
+      this.removeControl(legendCS);
     }
   });
 
   myMap.on('baselayerchange', function (eventLayer) {
     console.log(eventLayer.name);
-    if (eventLayer.name === "Cancer Death Rate") {
-      CanLegend.addTo(this);
-      this.removeControl(HRSLegend);
+    if (eventLayer.name === "Employment Rate"){
+      EmpRateLegend.addTo(this);
       this.removeControl(InLegend);
-      this.removeControl(PopLegend);
-    } else if (eventLayer.name === "Population Density"){
-      PopLegend.addTo(this);
-      this.removeControl(CanLegend);
-      this.removeControl(HRSLegend);
-      this.removeControl(InLegend);
-    } else if (eventLayer.name === "Avg. HRS Score") {
-      HRSLegend.addTo(this);
-      this.removeControl(CanLegend);
-      this.removeControl(PopLegend);
-      this.removeControl(InLegend);
-    } else if (eventLayer.name === "Avg. Income") {
+      this.removeControl(ADILegend);
+      this.removeControl(DeathsLegend);
+      this.removeControl(OpioidRxLegend);
+    } else if (eventLayer.name === "Median Income") {
       InLegend.addTo(this);
-      this.removeControl(CanLegend);
-      this.removeControl(PopLegend);
-      this.removeControl(HRSLegend);
-    } else if (eventLayer.name === "Nothing") {
-      this.removeControl(CanLegend);
-      this.removeControl(PopLegend);
-      this.removeControl(HRSLegend);
+      this.removeControl(ADILegend);
+      this.removeControl(EmpRateLegend);
+      this.removeControl(DeathsLegend);
+      this.removeControl(OpioidRxLegend);
+    } else if (eventLayer.name === "Neighborhood Deprivation") {
+      ADILegend.addTo(this);
       this.removeControl(InLegend);
+      this.removeControl(EmpRateLegend);
+      this.removeControl(DeathsLegend);
+      this.removeControl(OpioidRxLegend);
+    } else if (eventLayer.name === "Deaths per 1,000 Pop") {
+      DeathsLegend.addTo(this);
+      this.removeControl(ADILegend);
+      this.removeControl(EmpRateLegend);
+      this.removeControl(OpioidRxLegend);
+      this.removeControl(InLegend);
+    } else if (eventLayer.name === "Opioid Rx per 1,000 Pop") {
+      OpioidRxLegend.addTo(this);
+      this.removeControl(ADILegend);
+      this.removeControl(EmpRateLegend);
+      this.removeControl(DeathsLegend);
+      this.removeControl(InLegend);
+    } else if (eventLayer.name === "Nothing") {
+      this.removeControl(EmpRateLegend);
+      this.removeControl(InLegend);
+      this.removeControl(ADILegend);
+      this.removeControl(DeathsLegend);
+      this.removeControl(OpioidRxLegend);
     }
 
 

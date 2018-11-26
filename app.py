@@ -2,7 +2,7 @@
 
 import pandas as pd
 import requests
-from config import api_key
+from lacrime_config import lacrime_api_key
 import sqlite3
 import sys
 from flask import Flask, render_template,jsonify,request, redirect
@@ -23,6 +23,7 @@ Base = automap_base(metadata=db.metadata)
 engine = db.get_engine()
 Base.prepare(engine, reflect=True)
 LACrime = Base.classes.new_la_crime
+ZipCombinedStats = Base.classes.la_zip_stats
 # LARealEstateStats = Base.classes.la_real_estate
 
 
@@ -137,7 +138,7 @@ def state_stats_get_data():
     r"""API backend that returns a json of the
     crime statistics for d3"""
     
-    res = db.session.query(LACrime).all()
+    res = db.session.query(ZipCombinedStats).all()
 
     dlist = []
 
@@ -149,8 +150,11 @@ def state_stats_get_data():
 
     # find min and max for
     # selected columns
-    min_max_list = ['hour_occ',
-                    'vict_age','crm_cd'
+    min_max_list = ['household_median_income',
+                    'pct_full_time_employed_pop',
+                    'total_deaths_per_1000',
+                    'opioid_rx_per_1000',
+                    'adi_state_rank'
                     ]
 
     for item in min_max_list:

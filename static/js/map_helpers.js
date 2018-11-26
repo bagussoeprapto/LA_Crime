@@ -1,25 +1,25 @@
-function getColorSFSites(d) {
-    return d > 70 ? '#b30000' :
-        d > 60 ? '#e60000' :
-        d > 50 ? '#FF3300' :
-        d > 40 ? '#FF6600' :
-        d > 30 ? '#FF9900' :
-        d > 20 ? '#FFCC00' :
-        d > 10 ? '#99FF00' :
-        '#00FF00';
+function getColorCrimeSites(d) {
+    return d > 700 ? '#ffcccc' :
+        d > 600 ? '#ff9999' :
+        d > 500 ? '#ff6666' :
+        d > 400 ? '#ff4d4d' :
+        d > 300 ? '#ff3333' :
+        d > 200 ? '#cc0000' :
+        d > 100 ? '#000000' :
+        '#000000';
 }
 
-// Add color to states
-function getStateColor(d) {
-    return d > 1000 ? '#800026' :
-        d > 500 ? '#BD0026' :
-        d > 200 ? '#E31A1C' :
-        d > 100 ? '#FC4E2A' :
-        d > 50 ? '#FD8D3C' :
-        d > 20 ? '#FEB24C' :
-        d > 10 ? '#FED976' :
-        '#FFEDA0';
-}
+// // Add color to zip codes
+// function getZipColor(d) {
+//     return d > 1000 ? '#800026' :
+//         d > 500 ? '#BD0026' :
+//         d > 200 ? '#E31A1C' :
+//         d > 100 ? '#FC4E2A' :
+//         d > 50 ? '#FD8D3C' :
+//         d > 20 ? '#FEB24C' :
+//         d > 10 ? '#FED976' :
+//         '#FFEDA0';
+// }
 
 function colorScale(d, min, max) {
     var colors = ['#FFEDA0', '#FED976', '#FEB24C',
