@@ -112,8 +112,8 @@ function createZipChloro(prop,sdata,name) {
       opacity: 0.3,
       color: 'white',
       dashArray: '3',
-      //fillOpacity: 0.5,
-      zindex: -0.25
+      //fillOpacity: 1,
+      zindex: -1
     };
   }
 
