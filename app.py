@@ -34,7 +34,7 @@ def index():
 @app.route("/new_la_crime_data")
 def refresh_data():
     # Collect refreshed data from LA crime API (https://data.lacity.org/resource/7fvc-faax.json?)
-    incidents = requests.get("https://data.lacity.org/resource/7fvc-faax.json?$order=date_occ%20DESC").json()
+    incidents = requests.get("https://data.lacity.org/resource/7fvc-faax.json?$$app_token=" + lacrime_api_key + "&$order=date_occ%20DESC").json()
     
     # Store new crime_data in dataframe and convert datatypes
     crime_data = pd.DataFrame(incidents).set_index(["dr_no"])
